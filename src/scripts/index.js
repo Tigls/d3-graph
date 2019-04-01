@@ -1,5 +1,14 @@
 import { graph } from './graph-ui/graph-simulation';
 
+let selected_node;
+let selected_target_node;
+let selected_link; 
+let new_line;
+let circlesg; 
+let linesg;
+let should_drag = false;
+let drawing_line = false;
+
 const data = {
   nodes:
     [

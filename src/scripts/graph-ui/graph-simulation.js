@@ -4,9 +4,7 @@ import { drag } from './graph-drag';
 export const graph = (data) => {
   const width = 1080;
   const height = 800;
-  console.log('Before: ', data.links);
   const links = data.links.map(d => Object.create(d));
-  console.log('After: ', links);
   const nodes = data.nodes.map(d => Object.create(d));
 
   const simulation = d3.forceSimulation(nodes)
@@ -76,6 +74,7 @@ export const graph = (data) => {
     node
       .attr("transform", (d) => `translate(${d.x},${d.y})`)
   };
+
 
   return svg.node();
 }
