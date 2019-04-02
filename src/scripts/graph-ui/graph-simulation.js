@@ -8,8 +8,9 @@ export const graph = (data) => {
 
   state.links = data.links.map(d => Object.create(d));
   state.nodes = data.nodes.map(d => Object.create(d));
-
-  state.simulation = d3.forceSimulation(state.nodes)
+  
+  state.simulation = d3
+    .forceSimulation(state.nodes)
     .force("link", d3.forceLink(state.links).id(d => d.id).distance(200))
     .force("charge", d3.forceManyBody().strength(-200))
     .force("center", d3.forceCenter(width / 2, height / 2));
@@ -17,16 +18,16 @@ export const graph = (data) => {
   const svg = d3.select('svg');
   state.svg = svg;
   initialGraph();
-  console.log(state);
+  console.log('Before update: ', state);
   update();
-  console.log(state);
+  update();
+  console.log('After update:', state);
   d3.select(window)
     // .on("mousemove", mousemove)
     .on("mousedown", mousedown)
-    .on("mouseup", mouseup)
+    // .on("mouseup", mouseup)
     .on("keydown", keydown)
     .on("keyup", keyup);
-  
   return state.svg.node();
 }
 
@@ -47,40 +48,42 @@ function initialGraph() {
     .attr("d", "M 0 0 6 3 0 6 1 3")
     .style("fill", "#666666");
   
-  state.nodesClass = state.svg.append("g")
+  state.circlesg = state.svg.append("g")
     .attr("class", "nodes")
 }
 
 function update() {
-  console.log('In Update: ', state);
-  state.link = state.linesg
+  console.log('Start Update: ', state);
+  const link = state.linesg
     .selectAll("line")
     .data(state.links);
-  state.link
+  link
     .enter()
     .append("line")
     .attr("stroke-width", 3)
     .attr("stroke", "#666666");
-  state.link
+  link
     .exit()
     .remove();
 
   d3.selectAll("line").attr("marker-end", "url(#triangle)");
 
-  state.node = state.nodesClass
+  const node = state.circlesg
     .selectAll("g")
     .data(state.nodes);
-  state.nodeg = state.node
+  const nodeg = node
     .enter()
     .append("g")
     .call(drag(state.simulation));
-  const circles = state.node.append("circle")
+  const circles = nodeg
+    .append("circle")
     .attr("r", 25)
     .attr("class", "circle")
     .style("stroke", '#666666')
     .style('stroke-width', '3')
     .style('fill', '#1d1f20')
-  const lables = state.node.append("text")
+  const lables = nodeg
+    .append("text")
     .text(d => d.name)
     .style("fill", "#666666")
     .style("font-weight", "600")
@@ -89,19 +92,20 @@ function update() {
     .style("alignment-baseline", "middle")
     .style("font-size", "10px")
     .style("font-family", "cursive")
-  state.nodeg
+  node
     .exit()
     .remove();
 
   state.simulation.nodes(state.nodes).on("tick", ticked)
+  
   function ticked() {
-    state.link
+    link
       .attr("x1", d => d.source.x)
       .attr("y1", d => d.source.y)
       .attr("x2", d => d.target.x)
       .attr("y2", d => d.target.y);
 
-    state.nodeg
+    node
       .attr("transform", (d) => `translate(${d.x},${d.y})`)
   };
 }
@@ -131,13 +135,19 @@ function mousemove() {
 
 // add a new disconnected node
 function mousedown() {
-  console.log(state)
-  const m = d3.mouse(state.svg.node())
-  state.nodes.push({ x: m[0], y: m[1], index: 4 });
+
+  const m = d3.mouse(d3.select('svg').node())
+  console.log(state.nodes.length);
+  state.nodes.push({ 
+    index: state.nodes.length,
+    x: m[0],
+    y: m[1],
+  });
   state.selected_link = null;
   state.simulation.stop();
   update();
   state.simulation.restart();
+  console.log('After Mouse Down: ', state);
 }
 
 // end node select / add new connected node
