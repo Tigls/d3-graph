@@ -11,8 +11,8 @@ export const graph = (data) => {
   
   state.simulation = d3
     .forceSimulation(state.nodes)
-    .force("link", d3.forceLink(state.links).id(d => d.id).distance(200))
-    .force("charge", d3.forceManyBody().strength(-200))
+    .force("link", d3.forceLink(state.links).id(d => d.id).distance(100))
+    .force("charge", d3.forceManyBody().strength(-70))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
   const svg = d3.select('svg');
@@ -74,7 +74,8 @@ function update() {
   const nodeg = node
     .enter()
     .append("g")
-    .call(drag(state.simulation));
+    .call(drag(state.simulation))
+    .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
   const circles = nodeg
     .append("circle")
     .attr("r", 25)
@@ -82,6 +83,9 @@ function update() {
     .style("stroke", '#666666')
     .style('stroke-width', '3')
     .style('fill', '#1d1f20')
+    // .on("mousedown", node_mousedown)
+    // .on("mouseover", node_mouseover)
+    // .on("mouseout", node_mouseout);
   const lables = nodeg
     .append("text")
     .text(d => d.name)
@@ -145,6 +149,7 @@ function mousedown() {
   });
   state.selected_link = null;
   state.simulation.stop();
+  update();
   update();
   state.simulation.restart();
   console.log('After Mouse Down: ', state);
