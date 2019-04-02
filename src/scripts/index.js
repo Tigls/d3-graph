@@ -11,14 +11,7 @@ window.state = {
   new_line: undefined,
   circlesg: undefined,
   linesg: undefined,
-} 
-// var selected_node;
-// var selected_target_node;
-// var selected_link; 
-// var new_line;
-// var circlesg; 
-// var linesg;
-
+}
 
 const data = {
   nodes:

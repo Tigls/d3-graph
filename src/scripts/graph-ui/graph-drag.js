@@ -12,8 +12,8 @@ export const drag = (simulation) => {
   }
   function dragended(d) {
     if (!d3.event.active) simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
+    // d.fx = null;
+    // d.fy = null;
   }
   return d3.drag()
     .on("start", dragstarted)

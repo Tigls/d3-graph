@@ -23,9 +23,9 @@ export const graph = (data) => {
   update();
   console.log('After update:', state);
   d3.select(window)
-    // .on("mousemove", mousemove)
+    .on("mousemove", mousemove)
     .on("mousedown", mousedown)
-    // .on("mouseup", mouseup)
+    .on("mouseup", mouseup)
     .on("keydown", keydown)
     .on("keyup", keyup);
   return state.svg.node();
@@ -53,7 +53,6 @@ function initialGraph() {
 }
 
 function update() {
-  console.log('Start Update: ', state);
   const link = state.linesg
     .selectAll("line")
     .data(state.links);
@@ -61,7 +60,8 @@ function update() {
     .enter()
     .append("line")
     .attr("stroke-width", 3)
-    .attr("stroke", "#666666");
+    .attr("stroke", "#666666")
+    .on("mousedown", line_mousedown);
   link
     .exit()
     .remove();
@@ -83,9 +83,9 @@ function update() {
     .style("stroke", '#666666')
     .style('stroke-width', '3')
     .style('fill', '#1d1f20')
-    // .on("mousedown", node_mousedown)
-    // .on("mouseover", node_mouseover)
-    // .on("mouseout", node_mouseout);
+    .on("mousedown", node_mousedown)
+    .on("mouseover", node_mouseover)
+    .on("mouseout", node_mouseout);
   const lables = nodeg
     .append("text")
     .text(d => d.name)
@@ -100,8 +100,10 @@ function update() {
     .exit()
     .remove();
 
-  state.simulation.nodes(state.nodes).on("tick", ticked)
-  
+  state.simulation.nodes(state.nodes);
+  state.simulation.on("tick", ticked);
+  state.simulation.tick(50);
+  state.simulation.force("center", null);
   function ticked() {
     link
       .attr("x1", d => d.source.x)
@@ -115,7 +117,7 @@ function update() {
 }
 
 function mousemove() {
-  if (state.drawing_line && !state.should_drag) {
+  if (state.drawing_line && !state.should_drag && state.selected_node) {
     const m = d3.mouse(state.svg.node());
     const x = Math.max(0, Math.min(state.width, m[0]));
     const y = Math.max(0, Math.min(state.height, m[1]));
@@ -125,57 +127,104 @@ function mousemove() {
     if (Math.sqrt(dx * dx + dy * dy) > 10) {
       // draw a line
       if (!state.new_line) {
-        state.new_line = state.linesg.append("line").attr("class", "new_line");
+        state.new_line = state.linesg
+          .append("line")
+          .attr("stroke-width", 3)
+          .attr("stroke", "#666666");
       }
       state.new_line
-        .attr("x1", (d) => selected_node.x)
-        .attr("y1", (d) => selected_node.y)
+        .attr("x1", (d) => state.selected_node.x)
+        .attr("y1", (d) => state.selected_node.y)
         .attr("x2", (d) => x)
         .attr("y2", (d) => y);
     }
+    update();
+    update();
   }
-  update();
 }
 
 // add a new disconnected node
 function mousedown() {
-
+  state.simulation.stop();
   const m = d3.mouse(d3.select('svg').node())
-  console.log(state.nodes.length);
   state.nodes.push({ 
     index: state.nodes.length,
     x: m[0],
     y: m[1],
   });
   state.selected_link = null;
-  state.simulation.stop();
   update();
   update();
-  state.simulation.restart();
   console.log('After Mouse Down: ', state);
+}
+
+function node_mouseover(d) {
+  if (state.drawing_line && d !== state.selected_node) {
+    // highlight and select target node
+    state.selected_target_node = d;
+  }
+}
+
+function node_mouseout(d) {
+  if (state.drawing_line) {
+    state.selected_target_node = null;
+  }
+}
+
+// select node / start drag
+function node_mousedown(d) {
+  if (!state.drawing_line) {
+    state.selected_node = d;
+    state.selected_link = null;
+  }
+  if (!state.should_drag) {
+    d3.event.stopPropagation();
+    state.drawing_line = true;
+  }
+  d.fixed = true;
+  state.simulation.stop()
+  update();
+  update();
+}
+
+// select line
+function line_mousedown(d) {
+  state.selected_link = d;
+  state.selected_node = null;
+  update();
+  update();
 }
 
 // end node select / add new connected node
 function mouseup() {
   state.drawing_line = false;
+  let new_node;
   if (state.new_line) {
     if (state.selected_target_node) {
       state.selected_target_node.fixed = false;
-      const new_node = state.selected_target_node;
+      new_node = state.selected_target_node;
     } else {
-      const m = d3.mouse(svg.node());
-      const new_node = {x: m[0], y: m[1], name: default_name + " " + nodes.length, group: 1}
-      nodes.push(new_node);
+      const m = d3.mouse(state.svg.node());
+      new_node = {
+        index: state.nodes.length,
+        x: m[0],
+        y: m[1],
+      }
+      state.nodes.push(new_node);
     }
     state.selected_node.fixed = false;
-    data.links.push({source: state.selected_node, target: new_node})
-    state.selected_node = selected_target_node = null;
+    state.links.push({source: state.selected_node, target: new_node})
+    state.selected_node = state.selected_target_node = null;
     update();
-    setTimeout(function () {
-      new_line.remove();
-      state.new_line = null;
-      force.start();
-    }, 300);
+    update();
+    state.new_line.remove();
+    state.new_line = null;
+    state.simulation.restart()
+    // setTimeout(function () {
+      // state.new_line.remove();
+      // state.new_line = null;
+    //   state.simulation.restart();
+    // }, 300);
   }
 }
 
@@ -184,7 +233,8 @@ function keyup() {
     case 16: { // shift
       should_drag = false;
       update();
-      force.start();
+      update();
+      // state.simulation.restart();
     }
   }
 }
@@ -211,6 +261,7 @@ function keydown() {
         links.splice(i, 1);
         selected_link = links.length ? links[i > 0 ? i - 1 : 0] : null;
       }
+      update();
       update();
       break;
     }
