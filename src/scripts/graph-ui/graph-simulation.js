@@ -2,57 +2,92 @@ import * as d3 from '../utils/d3';
 import { drag } from './graph-drag';
 
 export const graph = (data) => {
+ 
   const width = 1080;
   const height = 800;
-  const links = data.links.map(d => Object.create(d));
-  const nodes = data.nodes.map(d => Object.create(d));
 
-  const simulation = d3.forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id(d => d.id).distance(200))
-    .force("charge", d3.forceManyBody().strength(-200))
+  state.links = data.links.map(d => Object.create(d));
+  state.nodes = data.nodes.map(d => Object.create(d));
+  
+  state.simulation = d3
+    .forceSimulation(state.nodes)
+    .force("link", d3.forceLink(state.links).id(d => d.id).distance(100))
+    .force("charge", d3.forceManyBody().strength(-70))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
   const svg = d3.select('svg');
+  state.svg = svg;
+  initialGraph();
+  console.log('Before update: ', state);
+  update();
+  update();
+  console.log('After update:', state);
+  d3.select(window)
+    .on("mousemove", mousemove)
+    .on("mousedown", mousedown)
+    .on("mouseup", mouseup)
+    .on("keydown", keydown)
+    .on("keyup", keyup);
+  return state.svg.node();
+}
 
-  const link = svg.append("g")
+function initialGraph() {
+  state.linesg = state.svg.append("g")
     .attr("class", "links")
-    .selectAll("line")
-    .data(links)
-    .enter()
-    .append("line")
-    .attr("stroke-width", 3)
-    .attr("stroke", "#666666")
   
-  const marker = svg.append("defs")
+  state.marker = state.svg.append("defs")
     .append("marker")
     .attr("id", "triangle")
     .attr("refX", 14)
     .attr("refY", 3)
-    .attr("markerUnits", 10)
+    // .attr("markerUnits", 10)
     .attr("markerWidth", 8)
     .attr("markerHeight", 30)
     .attr("orient", "auto")
     .append("path")
     .attr("d", "M 0 0 6 3 0 6 1 3")
     .style("fill", "#666666");
-  d3.selectAll("line").attr("marker-end", "url(#triangle)");
-    
-  const node = svg.append("g")
+  
+  state.circlesg = state.svg.append("g")
     .attr("class", "nodes")
+}
+
+function update() {
+  const link = state.linesg
+    .selectAll("line")
+    .data(state.links);
+  link
+    .enter()
+    .append("line")
+    .attr("stroke-width", 3)
+    .attr("stroke", "#666666")
+    .on("mousedown", line_mousedown);
+  link
+    .exit()
+    .remove();
+
+  d3.selectAll("line").attr("marker-end", "url(#triangle)");
+
+  const node = state.circlesg
     .selectAll("g")
-    .data(nodes)
+    .data(state.nodes);
+  const nodeg = node
     .enter()
     .append("g")
-    .call(drag(simulation));
-    
-  const circles = node.append("circle")
+    .call(drag(state.simulation))
+    .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+  const circles = nodeg
+    .append("circle")
     .attr("r", 25)
     .attr("class", "circle")
     .style("stroke", '#666666')
     .style('stroke-width', '3')
     .style('fill', '#1d1f20')
-
-  const lables = node.append("text")
+    .on("mousedown", node_mousedown)
+    .on("mouseover", node_mouseover)
+    .on("mouseout", node_mouseout);
+  const lables = nodeg
+    .append("text")
     .text(d => d.name)
     .style("fill", "#666666")
     .style("font-weight", "600")
@@ -61,9 +96,14 @@ export const graph = (data) => {
     .style("alignment-baseline", "middle")
     .style("font-size", "10px")
     .style("font-family", "cursive")
-  
+  node
+    .exit()
+    .remove();
 
-  simulation.nodes(nodes).on("tick", ticked)
+  state.simulation.nodes(state.nodes);
+  state.simulation.on("tick", ticked);
+  state.simulation.tick(50);
+  state.simulation.force("center", null);
   function ticked() {
     link
       .attr("x1", d => d.source.x)
@@ -74,7 +114,160 @@ export const graph = (data) => {
     node
       .attr("transform", (d) => `translate(${d.x},${d.y})`)
   };
+}
 
+function mousemove() {
+  if (state.drawing_line && !state.should_drag && state.selected_node) {
+    const m = d3.mouse(state.svg.node());
+    const x = Math.max(0, Math.min(state.width, m[0]));
+    const y = Math.max(0, Math.min(state.height, m[1]));
+    // debounce - only start drawing line if it gets a bit big
+    const dx = state.selected_node.x - x;
+    const dy = state.selected_node.y - y;
+    if (Math.sqrt(dx * dx + dy * dy) > 10) {
+      // draw a line
+      if (!state.new_line) {
+        state.new_line = state.linesg
+          .append("line")
+          .attr("stroke-width", 3)
+          .attr("stroke", "#666666");
+      }
+      state.new_line
+        .attr("x1", (d) => state.selected_node.x)
+        .attr("y1", (d) => state.selected_node.y)
+        .attr("x2", (d) => x)
+        .attr("y2", (d) => y);
+    }
+    update();
+    update();
+  }
+}
 
-  return svg.node();
+// add a new disconnected node
+function mousedown() {
+  state.simulation.stop();
+  const m = d3.mouse(d3.select('svg').node())
+  state.nodes.push({ 
+    index: state.nodes.length,
+    x: m[0],
+    y: m[1],
+  });
+  state.selected_link = null;
+  update();
+  update();
+  console.log('After Mouse Down: ', state);
+}
+
+function node_mouseover(d) {
+  if (state.drawing_line && d !== state.selected_node) {
+    // highlight and select target node
+    state.selected_target_node = d;
+  }
+}
+
+function node_mouseout(d) {
+  if (state.drawing_line) {
+    state.selected_target_node = null;
+  }
+}
+
+// select node / start drag
+function node_mousedown(d) {
+  if (!state.drawing_line) {
+    state.selected_node = d;
+    state.selected_link = null;
+  }
+  if (!state.should_drag) {
+    d3.event.stopPropagation();
+    state.drawing_line = true;
+  }
+  d.fixed = true;
+  state.simulation.stop()
+  update();
+  update();
+}
+
+// select line
+function line_mousedown(d) {
+  state.selected_link = d;
+  state.selected_node = null;
+  update();
+  update();
+}
+
+// end node select / add new connected node
+function mouseup() {
+  state.drawing_line = false;
+  let new_node;
+  if (state.new_line) {
+    if (state.selected_target_node) {
+      state.selected_target_node.fixed = false;
+      new_node = state.selected_target_node;
+    } else {
+      const m = d3.mouse(state.svg.node());
+      new_node = {
+        index: state.nodes.length,
+        x: m[0],
+        y: m[1],
+      }
+      state.nodes.push(new_node);
+    }
+    state.selected_node.fixed = false;
+    state.links.push({source: state.selected_node, target: new_node})
+    state.selected_node = state.selected_target_node = null;
+    update();
+    update();
+    state.new_line.remove();
+    state.new_line = null;
+    state.simulation.restart()
+    // setTimeout(function () {
+      // state.new_line.remove();
+      // state.new_line = null;
+    //   state.simulation.restart();
+    // }, 300);
+  }
+}
+
+function keyup() {
+  switch (d3.event.keyCode) {
+    case 16: { // shift
+      should_drag = false;
+      update();
+      update();
+      // state.simulation.restart();
+    }
+  }
+}
+
+// select for dragging node with shift; delete node with backspace
+function keydown() {
+  switch (d3.event.keyCode) {
+    case 8: // backspace
+    case 46: { // delete
+      if (selected_node) { // deal with nodes
+        const i = nodes.indexOf(selected_node);
+        nodes.splice(i, 1);
+        // find links to/from this node, and delete them too
+        const new_links = [];
+        links.forEach(function(l) {
+          if (l.source !== selected_node && l.target !== selected_node) {
+            new_links.push(l);
+          }
+        });
+        links = new_links;
+        selected_node = nodes.length ? nodes[i > 0 ? i - 1 : 0] : null;
+      } else if (selected_link) { // deal with links
+        const i = links.indexOf(selected_link);
+        links.splice(i, 1);
+        selected_link = links.length ? links[i > 0 ? i - 1 : 0] : null;
+      }
+      update();
+      update();
+      break;
+    }
+    case 16: { // shift
+      should_drag = true;
+      break;
+    }
+  }
 }
