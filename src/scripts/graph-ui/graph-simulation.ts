@@ -1,5 +1,6 @@
 import * as d3 from '../utils/d3';
 import { drag } from './graph-drag';
+declare const state: any;
 
 export const graph = (data) => {
  
@@ -11,7 +12,7 @@ export const graph = (data) => {
   
   state.simulation = d3
     .forceSimulation(state.nodes)
-    .force("link", d3.forceLink(state.links).id(d => d.id).distance(100))
+    .force("link", d3.forceLink(state.links).distance(100)).id(d => d.id)
     .force("charge", d3.forceManyBody().strength(-70))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -231,7 +232,7 @@ function mouseup() {
 function keyup() {
   switch (d3.event.keyCode) {
     case 16: { // shift
-      should_drag = false;
+      state.should_drag = false;
       update();
       update();
       // state.simulation.restart();
@@ -244,29 +245,29 @@ function keydown() {
   switch (d3.event.keyCode) {
     case 8: // backspace
     case 46: { // delete
-      if (selected_node) { // deal with nodes
-        const i = nodes.indexOf(selected_node);
-        nodes.splice(i, 1);
+      if (state.selected_node) { // deal with nodes
+        const i = state.nodes.indexOf(state.selected_node);
+        state.nodes.splice(i, 1);
         // find links to/from this node, and delete them too
         const new_links = [];
-        links.forEach(function(l) {
-          if (l.source !== selected_node && l.target !== selected_node) {
+        state.links.forEach(function(l) {
+          if (l.source !== state.selected_node && l.target !== state.selected_node) {
             new_links.push(l);
           }
         });
-        links = new_links;
-        selected_node = nodes.length ? nodes[i > 0 ? i - 1 : 0] : null;
-      } else if (selected_link) { // deal with links
-        const i = links.indexOf(selected_link);
-        links.splice(i, 1);
-        selected_link = links.length ? links[i > 0 ? i - 1 : 0] : null;
+        state.links = new_links;
+        state.selected_node = state.nodes.length ? state.nodes[i > 0 ? i - 1 : 0] : null;
+      } else if (state.selected_link) { // deal with links
+        const i = state.links.indexOf(state.selected_link);
+        state.links.splice(i, 1);
+        state.selected_link = state.links.length ? state.links[i > 0 ? i - 1 : 0] : null;
       }
       update();
       update();
       break;
     }
     case 16: { // shift
-      should_drag = true;
+      state.should_drag = true;
       break;
     }
   }

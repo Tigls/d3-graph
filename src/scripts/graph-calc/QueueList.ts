@@ -28,7 +28,7 @@ export class QueueList {
 			const node = arr[i];
 			node.factor1 = node.criticalDepth / maxDepth + node.criticalTime / maxTime;
 		}
-		return Calculation.sortedNodesList(Calculation.getQueueNodeList(arr, matrix), 1);
+		return this.sortedNodesList(this.getQueueNodeList(arr, matrix), 1);
   }
 
   public static queue6List(graph: Graph): QueueNode[]{
@@ -43,7 +43,7 @@ export class QueueList {
 			node.weight = weights[i];
 			arr[i] = node;
 		}
-		return Calculation.sortedNodesList(Calculation.getQueueNodeList(arr, matrix), 6);
+		return this.sortedNodesList(this.getQueueNodeList(arr, matrix), 6);
   }
   
   public static queue12List(graph: Graph): QueueNode[]{
@@ -62,6 +62,44 @@ export class QueueList {
 			node.weight = weights[i];
 			arr[i] = node;
 		}
-		return Calculation.sortedNodesList(Calculation.getQueueNodeList(arr, matrix), 12);
-	}
+		return this.sortedNodesList(this.getQueueNodeList(arr, matrix), 12);
+  }
+  
+  public static sortedNodesList(list: QueueNode[], algN: number): QueueNode[] {
+    for (let i = 0; i < list.length - 1; i++) {
+      for (let j = 0; j < list.length - i - 1; j++) {
+        let flag = false;
+				if (algN == 1) {
+					flag = (list[j].factor1 <= list[j + 1].factor1);
+				} else if (algN == 6) {
+					flag = (list[j].criticalDepth <= list[j + 1].criticalDepth);
+				} else if (algN == 12) {
+					flag = (list[j].numOfOut <= list[j + 1].numOfOut);
+				}
+				if (flag)
+				{
+					const temp = list[j];
+					list[j] = list[j + 1];
+					list[j + 1] = temp;
+				}
+      }
+    }
+    return list;
+  }
+
+  public static getQueueNodeList(arr: QueueNode[], matrix: Matrix): QueueNode[] {
+    const result = [];
+    for (let node of arr) {
+      result.push(node);
+    }
+    for (let i = 0; i < matrix.length; i++) {
+      const node = result[i];
+      for (let j = 0; j < matrix[i].length; j++) {
+        if (matrix[i][j] === 1) {
+          result[j].parentNodes.push(node);
+        }
+      }
+    }
+    return result;
+  }
 }

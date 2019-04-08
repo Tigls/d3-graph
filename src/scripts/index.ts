@@ -1,4 +1,9 @@
 import { graph } from './graph-ui/graph-simulation';
+declare global {
+  interface Window {
+    state: any;
+  }
+}
 
 window.state = {
   width: 1080,
