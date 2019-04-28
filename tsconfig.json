@@ -10,7 +10,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es6",
-    "inlineSourceMap": true,
+    "inlineSourceMap": false,
     "allowJs": true,
     "outDir": "./dist",
     "lib":["dom", "es2015", "es2016"]

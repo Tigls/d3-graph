@@ -1,15 +1,17 @@
-import { Node } from "./Node";
-import { Link } from "./Link";
+import { INode } from "./Node";
+import { ILink } from "./Link";
 
 export class Graph {
-  nodesList: Node[] = [];
-  linksList: Link[] = [];
-  startNode: Node;
-  currentLink: Link;
+  nodes: INode[] = [];
+  links: ILink[] = [];
+  startNode: INode;
+  currentLink: ILink;
   type: GraphType;
   fileName: string;
-  constructor(type) {
+  constructor(type: GraphType, links:ILink[] = [], nodes:INode[]=[]) {
     this.type = type;
+    this.links = links;
+    this.nodes = nodes;
   }
 }
 

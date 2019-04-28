@@ -1,277 +1,307 @@
 import * as d3 from '../utils/d3';
 import { drag } from './graph-drag';
+import { ILink } from '../graph-classes/Link';
+import { INode } from '../graph-classes/Node';
+import { GraphType, Graph } from '../graph-classes/Graph';
+import { Simulation } from 'd3';
 declare const state: any;
 
-export const graph = (data) => {
- 
-  const width = 1080;
-  const height = 800;
-
-  if (data) {
-    state.links = data.links.map(d => Object.create(d));
-    state.nodes = data.nodes.map(d => Object.create(d));
+export class GraphSVG extends Graph {
+  width = 1080;
+  height = 800;
+  simulation: Simulation<INode, ILink>;
+  svg: any;
+  selected_link: ILink;
+  selected_node: INode;
+  selected_target_node: INode;
+  marker: any;
+  linesg: any;
+  circlesg: any;
+  drawing_line: any;
+  should_drag: boolean;
+  new_line: any;
+  constructor(type: GraphType, links:ILink[]=[], nodes:INode[]=[]) {
+    super(type, links, nodes);
+    this.init();
   }
   
-  state.simulation = d3
-    .forceSimulation(state.nodes)
-    .force("link", d3.forceLink(state.links).distance(100))
-    .force("charge", d3.forceManyBody().strength(-70))
-    .force("center", d3.forceCenter(width / 2, height / 2));
+  init() {
+    this.simulation = d3
+      .forceSimulation(this.nodes)
+      .force("link", d3.forceLink(this.links).distance(100))
+      .force("charge", d3.forceManyBody().strength(-70))
+      .force("center", d3.forceCenter(this.width / 2, this.height / 2));
 
-  const svg = d3.select('svg');
-  state.svg = svg;
-  initialGraph();
-  console.log('Before update: ', state);
-  update();
-  update();
-  console.log('After update:', state);
-  d3.select('svg')
-    .on("mousemove", mousemove)
-    .on("mousedown", mousedown)
-    .on("mouseup", mouseup);
-  d3.select(window)
-    .on("keydown", keydown)
-    .on("keyup", keyup);
-  return state.svg.node();
-}
+    const svg = d3.select('svg');
+    this.svg = svg;
+    this.initialGraph();
+    console.log('Before update: ', this);
+    this.update();
+    this.update();
+    console.log('After update:', this);
+    d3.select('svg')
+      .on("mousemove", this.mousemove.bind(this))
+      .on("mousedown", this.mousedown.bind(this))
+      .on("mouseup", this.mouseup.bind(this));
+    d3.select(window)
+      .on("keydown", this.keydown.bind(this))
+      .on("keyup", this.keyup.bind(this));
+    return this.svg.node();
+  }
 
-function initialGraph() {
-  state.linesg = state.svg.append("g")
-    .attr("class", "links")
-  
-  state.marker = state.svg.append("defs")
-    .append("marker")
-    .attr("id", "triangle")
-    .attr("refX", 14)
-    .attr("refY", 3)
-    // .attr("markerUnits", 10)
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 30)
-    .attr("orient", "auto")
-    .append("path")
-    .attr("d", "M 0 0 6 3 0 6 1 3")
-    .style("fill", "#666666");
-  
-  state.circlesg = state.svg.append("g")
-    .attr("class", "nodes")
-}
+  initialGraph() {
+    this.linesg = this.svg.append("g")
+      .attr("class", "links")
+    
+    this.marker = this.svg.append("defs")
+      .append("marker")
+      .attr("id", "triangle")
+      .attr("refX", 14)
+      .attr("refY", 3)
+      // .attr("markerUnits", 10)
+      .attr("markerWidth", 8)
+      .attr("markerHeight", 30)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M 0 0 6 3 0 6 1 3")
+      .style("fill", "#666666");
+    
+    this.circlesg = this.svg.append("g")
+      .attr("class", "nodes")
+  }
 
-function update() {
-  const link = state.linesg
-    .selectAll("line")
-    .data(state.links);
-  link
-    .enter()
-    .append("line")
-    .attr("stroke-width", 3)
-    .attr("stroke", "#666666")
-    .on("mousedown", line_mousedown);
-  link
-    .exit()
-    .remove();
-
-  d3.selectAll("line").attr("marker-end", "url(#triangle)");
-
-  const node = state.circlesg
-    .selectAll("g")
-    .data(state.nodes);
-  const nodeg = node
-    .enter()
-    .append("g")
-    .call(drag(state.simulation))
-    .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
-  const circles = nodeg
-    .append("circle")
-    .attr("r", 25)
-    .attr("class", "circle")
-    .style("stroke", '#666666')
-    .style('stroke-width', '3')
-    .style('fill', '#1d1f20')
-    .on("mousedown", node_mousedown)
-    .on("mouseover", node_mouseover)
-    .on("mouseout", node_mouseout);
-  const lables = nodeg
-    .append("text")
-    .text(d => `node ${d.id}`)
-    .style("fill", "#666666")
-    .style("font-weight", "600")
-    .style("text-transform", "uppercase")
-    .style("text-anchor", "middle")
-    .style("alignment-baseline", "middle")
-    .style("font-size", "10px")
-    .style("font-family", "cursive")
-  node
-    .exit()
-    .remove();
-
-  state.simulation.nodes(state.nodes);
-  state.simulation.on("tick", ticked);
-  state.simulation.tick(50);
-  state.simulation.force("center", null);
-  function ticked() {
+  update() {
+    const link = this.linesg
+      .selectAll("line")
+      .data(this.links);
     link
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
+      .enter()
+      .append("line")
+      .attr("stroke-width", 3)
+      .attr("stroke", "#666666")
+      .on("mousedown", this.line_mousedown.bind(this));
+    link
+      .exit()
+      .remove();
 
+    d3.selectAll("line").attr("marker-end", "url(#triangle)");
+
+    const node = this.circlesg
+      .selectAll("g")
+      .data(this.nodes);
+    const nodeg = node
+      .enter()
+      .append("g")
+      .call(drag(this.simulation))
+      .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+    const circles = nodeg
+      .append("circle")
+      .attr("r", 25)
+      .attr("class", "circle")
+      .style("stroke", '#666666')
+      .style('stroke-width', '3')
+      .style('fill', '#1d1f20')
+      .on("mousedown", this.node_mousedown.bind(this))
+      .on("mouseover", this.node_mouseover.bind(this))
+      .on("mouseout", this.node_mouseout.bind(this));
+    const lables = nodeg
+      .append("text")
+      .text(d => `node ${d.id}`)
+      .style("fill", "#666666")
+      .style("font-weight", "600")
+      .style("text-transform", "uppercase")
+      .style("text-anchor", "middle")
+      .style("alignment-baseline", "middle")
+      .style("font-size", "10px")
+      .style("font-family", "cursive")
     node
-      .attr("transform", (d) => `translate(${d.x},${d.y})`)
-  };
-}
+      .exit()
+      .remove();
 
-function mousemove() {
-  if (state.drawing_line && !state.should_drag && state.selected_node) {
-    const m = d3.mouse(state.svg.node());
-    const x = Math.max(0, Math.min(state.width, m[0]));
-    const y = Math.max(0, Math.min(state.height, m[1]));
-    // debounce - only start drawing line if it gets a bit big
-    const dx = state.selected_node.x - x;
-    const dy = state.selected_node.y - y;
-    if (Math.sqrt(dx * dx + dy * dy) > 10) {
-      // draw a line
-      if (!state.new_line) {
-        state.new_line = state.linesg
-          .append("line")
-          .attr("stroke-width", 3)
-          .attr("stroke", "#666666");
+    this.simulation.nodes(this.nodes);
+    this.simulation.on("tick", ticked);
+    this.simulation.tick(50);
+    this.simulation.force("center", null);
+    function ticked() {
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      node
+        .attr("transform", (d) => `translate(${d.x},${d.y})`)
+    };
+  }
+
+  mousemove() {
+    if (this.drawing_line && !this.should_drag && this.selected_node) {
+      const m = d3.mouse(this.svg.node());
+      const x = Math.max(0, Math.min(this.width, m[0]));
+      const y = Math.max(0, Math.min(this.height, m[1]));
+      // debounce - only start drawing line if it gets a bit big
+      const dx = this.selected_node.x - x;
+      const dy = this.selected_node.y - y;
+      if (Math.sqrt(dx * dx + dy * dy) > 10) {
+        // draw a line
+        if (!this.new_line) {
+          this.new_line = this.linesg
+            .append("line")
+            .attr("stroke-width", 3)
+            .attr("stroke", "#666666");
+        }
+        this.new_line
+          .attr("x1", (d) => this.selected_node.x)
+          .attr("y1", (d) => this.selected_node.y)
+          .attr("x2", (d) => x)
+          .attr("y2", (d) => y);
       }
-      state.new_line
-        .attr("x1", (d) => state.selected_node.x)
-        .attr("y1", (d) => state.selected_node.y)
-        .attr("x2", (d) => x)
-        .attr("y2", (d) => y);
+      this.update();
+      this.update();
     }
-    update();
-    update();
   }
-}
 
-// add a new disconnected node
-function mousedown() {
-  state.simulation.stop();
-  const m = d3.mouse(d3.select('svg').node())
-  state.nodes.push({ 
-    index: state.nodes.length,
-    x: m[0],
-    y: m[1],
-  });
-  state.selected_link = null;
-  update();
-  update();
-  console.log('After Mouse Down: ', state);
-}
-
-function node_mouseover(d) {
-  if (state.drawing_line && d !== state.selected_node) {
-    // highlight and select target node
-    state.selected_target_node = d;
+  // add a new disconnected node
+  mousedown() {
+    console.log('!!!!!!', this);
+    this.simulation.stop();
+    const m = d3.mouse(d3.select('svg').node())
+    this.nodes.push({ 
+      index: this.nodes.length,
+      x: m[0],
+      y: m[1],
+      id: this.nodes.length,
+      weight: 1
+    });
+    this.selected_link = null;
+    this.update();
+    this.update();
+    console.log('After Mouse Down: ', this);
   }
-}
 
-function node_mouseout(d) {
-  if (state.drawing_line) {
-    state.selected_target_node = null;
+  node_mouseover(d) {
+    if (this.drawing_line && d !== this.selected_node) {
+      // highlight and select target node
+      this.selected_target_node = d;
+    }
   }
-}
 
-// select node / start drag
-function node_mousedown(d) {
-  if (!state.drawing_line) {
-    state.selected_node = d;
-    state.selected_link = null;
+  node_mouseout(d) {
+    if (this.drawing_line) {
+      this.selected_target_node = null;
+    }
   }
-  if (!state.should_drag) {
-    d3.event.stopPropagation();
-    state.drawing_line = true;
+
+  // select node / start drag
+  node_mousedown(d) {
+    if (!this.drawing_line) {
+      this.selected_node = d;
+      this.selected_link = null;
+    }
+    if (!this.should_drag) {
+      d3.event.stopPropagation();
+      this.drawing_line = true;
+    }
+    d.fixed = true;
+    this.simulation.stop()
+    this.update();
+    this.update();
   }
-  d.fixed = true;
-  state.simulation.stop()
-  update();
-  update();
-}
 
-// select line
-function line_mousedown(d) {
-  state.selected_link = d;
-  state.selected_node = null;
-  update();
-  update();
-}
+  // select line
+  line_mousedown(d) {
+    this.selected_link = d;
+    this.selected_node = null;
+    this.update();
+    this.update();
+  }
 
-// end node select / add new connected node
-function mouseup() {
-  state.drawing_line = false;
-  let new_node;
-  if (state.new_line) {
-    if (state.selected_target_node) {
-      state.selected_target_node.fixed = false;
-      new_node = state.selected_target_node;
-    } else {
-      const m = d3.mouse(state.svg.node());
-      new_node = {
-        index: state.nodes.length,
-        x: m[0],
-        y: m[1],
+  // end node select / add new connected node
+  mouseup() {
+    this.drawing_line = false;
+    let new_node: INode;
+    if (this.new_line) {
+      if (this.selected_target_node) {
+        this.selected_target_node.fixed = false;
+        new_node = this.selected_target_node;
+      } else {
+        const m = d3.mouse(this.svg.node());
+        new_node = {
+          index: this.nodes.length,
+          x: m[0],
+          y: m[1],
+          id: this.nodes.length,
+          weight: 1,
+        }
+        this.nodes.push(new_node);
       }
-      state.nodes.push(new_node);
-    }
-    state.selected_node.fixed = false;
-    state.links.push({source: state.selected_node, target: new_node})
-    state.selected_node = state.selected_target_node = null;
-    update();
-    update();
-    state.new_line.remove();
-    state.new_line = null;
-    state.simulation.restart()
-    // setTimeout(function () {
-      // state.new_line.remove();
-      // state.new_line = null;
-    //   state.simulation.restart();
-    // }, 300);
-  }
-}
-
-function keyup() {
-  switch (d3.event.keyCode) {
-    case 16: { // shift
-      state.should_drag = false;
-      update();
-      update();
-      // state.simulation.restart();
+      this.selected_node.fixed = false;
+      this.links.push({
+        source: this.selected_node,
+        target: new_node,
+        id: this.links.length,
+        index: this.links.length,
+        weight: 1
+      })
+      this.selected_node = this.selected_target_node = null;
+      this.update();
+      this.update();
+      this.new_line.remove();
+      this.new_line = null;
+      this.simulation.restart()
+      // setTimeout(function () {
+        // this.new_line.remove();
+        // this.new_line = null;
+      //   this.simulation.restart();
+      // }, 300);
     }
   }
-}
 
-// select for dragging node with shift; delete node with backspace
-function keydown() {
-  switch (d3.event.keyCode) {
-    case 8: // backspace
-    case 46: { // delete
-      if (state.selected_node) { // deal with nodes
-        const i = state.nodes.indexOf(state.selected_node);
-        state.nodes.splice(i, 1);
-        // find links to/from this node, and delete them too
-        const new_links = [];
-        state.links.forEach(l => {
-          if (l.source !== state.selected_node && l.target !== state.selected_node) {
-            new_links.push(l);
-          }
-        });
-        state.links = new_links;
-        state.selected_node = state.nodes.length ? state.nodes[i > 0 ? i - 1 : 0] : null;
-      } else if (state.selected_link) { // deal with links
-        const i = state.links.indexOf(state.selected_link);
-        state.links.splice(i, 1);
-        state.selected_link = state.links.length ? state.links[i > 0 ? i - 1 : 0] : null;
+  keyup() {
+    switch (d3.event.keyCode) {
+      case 16: { // shift
+        this.should_drag = false;
+        this.update();
+        this.update();
+        // this.simulation.restart();
       }
-      update();
-      update();
-      break;
     }
-    case 16: { // shift
-      state.should_drag = true;
-      break;
+  }
+
+  // select for dragging node with shift; delete node with backspace
+  keydown() {
+    switch (d3.event.keyCode) {
+      case 8: // backspace
+      case 46: { // delete
+        if (this.selected_node) { // deal with nodes
+          const i = this.nodes.indexOf(this.selected_node);
+          this.nodes.splice(i, 1);
+          // find links to/from this node, and delete them too
+          const new_links: ILink[] = [];
+          this.links.forEach(l => {
+            if (l.source !== this.selected_node && l.target !== this.selected_node) {
+              new_links.push(l);
+            }
+          });
+          this.links = new_links;
+          this.selected_node = this.nodes.length ? this.nodes[i > 0 ? i - 1 : 0] : null;
+        } else if (this.selected_link) { // deal with links
+          const i = this.links.indexOf(this.selected_link);
+          this.links.splice(i, 1);
+          this.selected_link = this.links.length ? this.links[i > 0 ? i - 1 : 0] : null;
+        }
+        this.update();
+        this.update();
+        break;
+      }
+      case 16: { // shift
+        this.should_drag = true;
+        break;
+      }
     }
+  }
+
+  clear() {
+    d3.select('svg').selectAll("*").remove();
   }
 }

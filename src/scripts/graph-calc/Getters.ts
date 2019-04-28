@@ -1,24 +1,15 @@
 import { Graph, GraphType, Matrix } from "../graph-classes/Graph";
-import { Node } from "../graph-classes/Node";
-import { Link } from "../graph-classes/Link";
 
 export class Getters {
-  public static getGraph(nodes: Node[], links: Link[], type: GraphType): Graph {
-    const graph: Graph = new Graph(type);
-    graph.nodesList = nodes;
-    graph.linksList = links;
-    graph.startNode = nodes[0];
-    return graph;
-  }
   
   public static getMatrix(graph: Graph): Matrix {
-    const matrix = new Array(graph.nodesList.length);
+    const matrix = new Array(graph.nodes.length);
     for (let i = 0; i < matrix.length; i++) {
-      matrix[i] = new Array(graph.nodesList.length)
+      matrix[i] = new Array(graph.nodes.length)
     }
-    for (let link of graph.linksList) {
-      const source = graph.nodesList.indexOf(link.source)
-      const target = graph.nodesList.indexOf(link.target)
+    for (let link of graph.links) {
+      const source = graph.nodes.indexOf(link.source)
+      const target = graph.nodes.indexOf(link.target)
       matrix[source][target] = 1;
       if (graph.type === GraphType.GraphCS) {
         matrix[target][source] = 1;
@@ -28,23 +19,23 @@ export class Getters {
   }
 
   public static getWeights(graph: Graph): Array<number> {
-    const arr = new Array(graph.nodesList.length);
-    for (let node of graph.nodesList) {
-      arr[graph.nodesList.indexOf(node)] = node.weight;
+    const arr = new Array(graph.nodes.length);
+    for (let node of graph.nodes) {
+      arr[graph.nodes.indexOf(node)] = node.weight;
     }
     return arr;
   }
 
   public static getLinkWeights(graph: Graph, prodLinks: number): Matrix {
-    const nodesList = graph.nodesList;
+    const nodesList = graph.nodes;
     const size = nodesList.length;
     const arr: Matrix = new Array(size);
     for (let i = 0; i < arr.length; i++) {
       arr[i] = new Array(size);
     }
-    for (let link of graph.linksList) {
-      const source = graph.nodesList.indexOf(link.source)
-      const target = graph.nodesList.indexOf(link.target)
+    for (let link of graph.links) {
+      const source = graph.nodes.indexOf(link.source)
+      const target = graph.nodes.indexOf(link.target)
       arr[source][target] = Math.ceil(link.weight / prodLinks);
     }
     return arr;

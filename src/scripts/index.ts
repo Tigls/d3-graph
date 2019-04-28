@@ -1,4 +1,4 @@
-import { graph } from './graph-ui/graph-simulation';
+import { GraphSVG } from './graph-ui/graph-simulation';
 import { saveToFile, newGraph } from './ui/header';
 import { Getters } from './graph-calc/Getters';
 import { GraphType } from './graph-classes/Graph';
@@ -11,32 +11,21 @@ declare global {
 window.state = {
   width: 1080,
   height: 800,
-  should_drag: false,
-  drawing_line: false,
-  selected_node: undefined,
-  selected_target_node: undefined,
-  selected_link: undefined,
-  new_line: undefined,
-  circlesg: undefined,
-  linesg: undefined,
 }
 
-const data = {
-  nodes:
-    [
-      { "name": "fruit", "id": 0 },
-      { "name": "apple", "id": 1 },
-      { "name": "orange", "id": 2 },
-      { "name": "banana", "id": 3 }
-    ],
-  links:
-    [
-      { "source": 0, "target": 1, "id": 0 },
-      { "source": 0, "target": 2, "id": 1 }
-    ]
-}
+const nodes = [
+  { id: 0, weight: 1 },
+  { id: 1, weight: 1 },
+  { id: 2, weight: 1 },
+  { id: 3, weight: 1 }
+];
+const links = [
+  { source: nodes[0], target: nodes[1], id: 0, weight: 1 },
+  { source: nodes[0], target: nodes[2], id: 1, weight: 1 }
+]
 
-graph(data);
+
+window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes);
 
 document.querySelectorAll('a.dropdown-item')
   .forEach((el) => {
@@ -44,7 +33,5 @@ document.querySelectorAll('a.dropdown-item')
     el.innerHTML === 'Новий' && el.addEventListener('click', newGraph);
   });
 
-const graph1 = Getters.getGraph(window.state.nodes, window.state.links, GraphType.GraphTask);
-console.log(graph1);
-const matrix1 = Getters.getMatrix(graph1);
-console.log(matrix1)
+const matrix1 = Getters.getMatrix(window.state.graphTS);
+console.table(matrix1)
