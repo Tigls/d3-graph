@@ -1,15 +1,12 @@
-import { Graph, GraphType, Matrix } from "../graph-classes/Graph";
-import { Node } from "../graph-classes/Node";
-import { Link } from "../graph-classes/Link";
-import { ModellingNode } from "../graph-classes/ModellingNode";
-import { ModellingLink } from "../graph-classes/ModellingLink";
+import { Graph, Matrix } from "../graph-classes/Graph";
 import { QueueNode } from "../graph-classes/QueueNode";
 import { Calculation } from "./Calculation";
+import { Getters } from "./Getters";
 
 export class QueueList {
   public static queue1List(graph: Graph): QueueNode[] {
-		const matrix = Calculation.getMatrix(graph);
-		const weights = Calculation.getWeights(graph);
+		const matrix = Getters.getMatrix(graph);
+		const weights = Getters.getWeights(graph);
 		const arr: QueueNode[] = [];
 		let maxDepth = 0;
 		let maxTime = 0;
@@ -32,8 +29,8 @@ export class QueueList {
   }
 
   public static queue6List(graph: Graph): QueueNode[]{
-		const matrix = Calculation.getMatrix(graph);
-		const weights = Calculation.getWeights(graph);
+		const matrix = Getters.getMatrix(graph);
+		const weights = Getters.getWeights(graph);
 		const arr: QueueNode[] = [];
 
 		for (let i = 0; i < matrix.length; i++) {
@@ -47,8 +44,8 @@ export class QueueList {
   }
   
   public static queue12List(graph: Graph): QueueNode[]{
-		const matrix = Calculation.getMatrix(graph);
-		const weights = Calculation.getWeights(graph);
+		const matrix = Getters.getMatrix(graph);
+		const weights = Getters.getWeights(graph);
 		const arr: QueueNode[] = [];
 
 		for (let i = 0; i < matrix.length; i++) {

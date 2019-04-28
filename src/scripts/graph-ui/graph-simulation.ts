@@ -7,12 +7,14 @@ export const graph = (data) => {
   const width = 1080;
   const height = 800;
 
-  state.links = data.links.map(d => Object.create(d));
-  state.nodes = data.nodes.map(d => Object.create(d));
+  if (data) {
+    state.links = data.links.map(d => Object.create(d));
+    state.nodes = data.nodes.map(d => Object.create(d));
+  }
   
   state.simulation = d3
     .forceSimulation(state.nodes)
-    .force("link", d3.forceLink(state.links).distance(100)).id(d => d.id)
+    .force("link", d3.forceLink(state.links).distance(100))
     .force("charge", d3.forceManyBody().strength(-70))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -23,10 +25,11 @@ export const graph = (data) => {
   update();
   update();
   console.log('After update:', state);
-  d3.select(window)
+  d3.select('svg')
     .on("mousemove", mousemove)
     .on("mousedown", mousedown)
-    .on("mouseup", mouseup)
+    .on("mouseup", mouseup);
+  d3.select(window)
     .on("keydown", keydown)
     .on("keyup", keyup);
   return state.svg.node();
@@ -89,7 +92,7 @@ function update() {
     .on("mouseout", node_mouseout);
   const lables = nodeg
     .append("text")
-    .text(d => d.name)
+    .text(d => `node ${d.id}`)
     .style("fill", "#666666")
     .style("font-weight", "600")
     .style("text-transform", "uppercase")
@@ -250,7 +253,7 @@ function keydown() {
         state.nodes.splice(i, 1);
         // find links to/from this node, and delete them too
         const new_links = [];
-        state.links.forEach(function(l) {
+        state.links.forEach(l => {
           if (l.source !== state.selected_node && l.target !== state.selected_node) {
             new_links.push(l);
           }

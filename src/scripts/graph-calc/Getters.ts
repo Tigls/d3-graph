@@ -1,6 +1,16 @@
 import { Graph, GraphType, Matrix } from "../graph-classes/Graph";
+import { Node } from "../graph-classes/Node";
+import { Link } from "../graph-classes/Link";
 
 export class Getters {
+  public static getGraph(nodes: Node[], links: Link[], type: GraphType): Graph {
+    const graph: Graph = new Graph(type);
+    graph.nodesList = nodes;
+    graph.linksList = links;
+    graph.startNode = nodes[0];
+    return graph;
+  }
+  
   public static getMatrix(graph: Graph): Matrix {
     const matrix = new Array(graph.nodesList.length);
     for (let i = 0; i < matrix.length; i++) {
