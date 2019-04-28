@@ -1,4 +1,4 @@
-import { Node } from "./node";
+import { Node } from "./Node";
 import { ModellingNode } from "./ModellingNode";
 
 export class QueueNode extends Node {
@@ -23,4 +23,4 @@ export class QueueNode extends Node {
     }
     return true;
   }
-}
+} 

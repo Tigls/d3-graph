@@ -28,8 +28,8 @@ export class GraphSVG extends Graph {
   init() {
     this.simulation = d3
       .forceSimulation(this.nodes)
-      .force("link", d3.forceLink(this.links).distance(100))
-      .force("charge", d3.forceManyBody().strength(-70))
+      .force("link", d3.forceLink(this.links).distance(150))
+      .force("charge", d3.forceManyBody().strength(-200))
       .force("center", d3.forceCenter(this.width / 2, this.height / 2));
 
     const svg = d3.select('svg');

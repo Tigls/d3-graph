@@ -1,6 +1,6 @@
 import { Graph } from "../graph-classes/Graph";
 import { QueueNode } from "../graph-classes/QueueNode";
-import { QueueList } from "./queueList";
+import { QueueList } from "./QueueList";
 
 export class Queue {
   public static queue1(graph: Graph): string {
@@ -9,6 +9,16 @@ export class Queue {
 		for (let i = 0; i < list.length; i++) {
 			const n: QueueNode = list[i];
 			result = result + (n.id + 1) + "(" + n.factor1.toString() + "), ";
+		}
+		return result;
+  }
+  
+  public static queue3(graph: Graph): string {
+		const list = QueueList.queue1List(graph);
+		let result = "";
+		for (let i = 0; i < list.length; i++) {
+			const n: QueueNode = list[i];
+			result = result + (n.id + 1) + "(" + n.criticalTime.toString() + "), ";
 		}
 		return result;
 	}
@@ -29,6 +39,16 @@ export class Queue {
 		for (let i = 0; i < list.length; i++) {
       const n: QueueNode = list[i];
 			result = result + (n.id + 1) + "(" + n.numOfOut + "), ";
+		}
+		return result;
+  }
+  
+  public static queue15(graph: Graph): string{
+		const list: QueueNode[] = QueueList.queue6List(graph);
+		let result = "";
+		for (let i = 0; i < list.length; i++) {
+      const n: QueueNode = list[i];
+			result = result + (n.id + 1) + "(" + n.weight + "), ";
 		}
 		return result;
 	}
