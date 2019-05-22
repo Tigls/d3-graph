@@ -12,9 +12,9 @@
 </head>
 
 
-<body>
+<body class="bg-dark">
   <header>
-    <div class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="navbar navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="#">Лаб</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,12 +24,12 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-          <li class="nav-item dropdown">
+          <li class="nav-item dropdown bg-dark">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
               Граф задачі
             </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <div class="dropdown-menu " aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="#">Новий</a>
               <a class="dropdown-item" href="#">Редактор графу</a>
               <a class="dropdown-item" href="#">Генерування графу</a>
@@ -73,13 +73,43 @@
           <li class="nav-item">
             <a class="nav-link" href="#" tabindex="-1">Вихід</a>
           </li>
+          
+          <li class="nav-item p3"></li>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> Граф задач
+              </label>
+              <label class="btn btn-secondary">
+                <input type="radio" name="options" id="option2" autocomplete="off"> Граф КС
+              </label>
+            </div>
+          </li>
+
+          <li class="nav-item px-3 pt-2">
+            <div class="text-success">
+              <span class="acyclicGraph">Граф циклів не має</span>
+            </div>
+            <div class="text-danger d-none">
+              <span class="" id="hasCycleGraph">Граф має цикл</span>
+            </div>
+            <div class="text-danger d-none">
+              <span class="" id="nonAdjacentGraph">Граф не зв'язний</span>
+            </div>
+            <div class="text-success d-none">
+              <span class="" id="adjacentGraph">Граф зв'язний</span>
+            </div>
+          </li>
 
         </ul>
       </div>
     </div>
   </header>
 
-  <svg class="graph" width=1080 height=800>
+  <svg class="graph" id="graphTask" width=1080 height=800>
+
+  </svg>
+
+  <svg class="graph hidden" id="graphCS" width=1080 height=800>
 
   </svg>
 

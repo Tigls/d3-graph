@@ -20,8 +20,10 @@ export class GraphSVG extends Graph {
   drawing_line: any;
   should_drag: boolean;
   new_line: any;
-  constructor(type: GraphType, links:ILink[]=[], nodes:INode[]=[]) {
+  htmlId: string;
+  constructor(type: GraphType, links:ILink[]=[], nodes:INode[]=[], htmlId) {
     super(type, links, nodes);
+    this.htmlId = htmlId;
     this.init();
   }
   
@@ -32,14 +34,14 @@ export class GraphSVG extends Graph {
       .force("charge", d3.forceManyBody().strength(-200))
       .force("center", d3.forceCenter(this.width / 2, this.height / 2));
 
-    const svg = d3.select('svg');
+    const svg = d3.select(this.htmlId);
     this.svg = svg;
     this.initialGraph();
     console.log('Before update: ', this);
     this.update();
     this.update();
     console.log('After update:', this);
-    d3.select('svg')
+    d3.select(this.htmlId)
       .on("mousemove", this.mousemove.bind(this))
       .on("mousedown", this.mousedown.bind(this))
       .on("mouseup", this.mouseup.bind(this));
@@ -107,6 +109,7 @@ export class GraphSVG extends Graph {
     const lables = nodeg
       .append("text")
       .text(d => `node ${d.id}`)
+      .classed("unselectable", true)
       .style("fill", "#666666")
       .style("font-weight", "600")
       .style("text-transform", "uppercase")
@@ -165,7 +168,7 @@ export class GraphSVG extends Graph {
   mousedown() {
     console.log('!!!!!!', this);
     this.simulation.stop();
-    const m = d3.mouse(d3.select('svg').node())
+    const m = d3.mouse(d3.select(this.htmlId).node())
     this.nodes.push({ 
       index: this.nodes.length,
       x: m[0],
@@ -302,6 +305,6 @@ export class GraphSVG extends Graph {
   }
 
   clear() {
-    d3.select('svg').selectAll("*").remove();
+    d3.select(this.htmlId).selectAll("*").remove();
   }
 }

@@ -4,6 +4,7 @@ import { Getters } from './graph-calc/Getters';
 import { GraphType } from './graph-classes/Graph';
 import { QueueList } from './graph-calc/QueueList';
 import { Queue } from './graph-calc/Queue';
+import { Calculation } from './graph-calc/Calculation';
 declare global {
   interface Window {
     state: any;
@@ -43,7 +44,8 @@ const links = [
   { source: nodes[10], target: nodes[0], id: 11, weight: 1 },
 ]
 
-window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes);
+window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes, '#graphTask');
+window.state.graphCS = new GraphSVG(GraphType.GraphCS, [], [], '#graphCS');
 
 document.querySelectorAll('a.dropdown-item')
   .forEach((el) => {
@@ -64,3 +66,7 @@ const result15 = QueueList.queue15List(window.state.graphTS);
 console.log('15: ', result15);
 const result12 = QueueList.queue12List(window.state.graphTS);
 console.log('12: ', result12);
+
+const matrix1 = Getters.getMatrix(window.state.graphTS);
+const isCyclic = Calculation.isCyclic(window.state.graphTS);
+console.log('isCyclic: ', isCyclic);

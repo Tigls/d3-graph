@@ -1,5 +1,6 @@
-import { Graph, Matrix } from "../graph-classes/Graph";
+import { Graph, Matrix, GraphType } from "../graph-classes/Graph";
 import { Getters } from "./Getters";
+import { INode } from "../graph-classes/Node";
 
 export class Calculation {
 
@@ -119,5 +120,38 @@ export class Calculation {
 			}
 		}
 		return result;
-	}
+  }
+  
+  public static isCyclicUtil(i: number, visited: boolean[], recStack: boolean[], graph: Graph): boolean {
+    if (recStack[i]) 
+      return true; 
+
+    if (visited[i]) 
+      return false; 
+          
+    visited[i] = true; 
+    recStack[i] = true;
+
+    const children = graph.links
+      .filter((link) => link.source.id === i)
+      .map((link) => link.target.id); 
+      
+    for (const c of children)
+      if (this.isCyclicUtil(c, visited, recStack, graph))
+         return true; 
+              
+    recStack[i] = false;
+    return false;
+  }
+
+  public static isCyclic(graph: Graph): boolean {
+    const visited = []; 
+    const recStack = []; 
+      
+    for (let i = 0; i < graph.nodes.length; i++) 
+        if (this.isCyclicUtil(i, visited, recStack, graph)) 
+            return true;
+
+    return false; 
+  }
 }
