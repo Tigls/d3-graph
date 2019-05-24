@@ -75,7 +75,7 @@
           </li>
           
           <li class="nav-item p3"></li>
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <div class="btn-group btn-group-toggle" id="toggleGraph" data-toggle="buttons">
               <label class="btn btn-secondary active">
                 <input type="radio" name="options" id="option1" autocomplete="off" checked> Граф задач
               </label>
@@ -86,17 +86,17 @@
           </li>
 
           <li class="nav-item px-3 pt-2">
-            <div class="text-success">
-              <span class="acyclicGraph">Граф циклів не має</span>
+            <div class="text-success checks" id="acyclicGraph" tag="graphTS">
+              <span class="">Граф циклів не має</span>
             </div>
-            <div class="text-danger d-none">
-              <span class="" id="hasCycleGraph">Граф має цикл</span>
+            <div class="text-danger checks d-none"  id="hasCycleGraph" tag="graphTS">
+              <span class="">Граф має цикл</span>
             </div>
-            <div class="text-danger d-none">
-              <span class="" id="nonAdjacentGraph">Граф не зв'язний</span>
+            <div class="text-danger checks d-none" id="nonAdjacentGraph" tag="graphCS">
+              <span class="">Граф не зв'язний</span>
             </div>
-            <div class="text-success d-none">
-              <span class="" id="adjacentGraph">Граф зв'язний</span>
+            <div class="text-success checks d-none" id="adjacentGraph" tag="graphCS">
+              <span class="">Граф зв'язний</span>
             </div>
           </li>
 
@@ -105,7 +105,7 @@
     </div>
   </header>
 
-  <svg class="graph" id="graphTask" width=1080 height=800>
+  <svg class="graph" id="graphTS" width=1080 height=800>
 
   </svg>
 

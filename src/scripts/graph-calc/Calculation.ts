@@ -122,16 +122,13 @@ export class Calculation {
 		return result;
   }
   
-  public static isCyclicUtil(i: number, visited: boolean[], recStack: boolean[], graph: Graph): boolean {
+  private static isCyclicUtil(i: number, visited: boolean[], recStack: boolean[], graph: Graph): boolean {
     if (recStack[i]) 
       return true; 
-
     if (visited[i]) 
       return false; 
-          
     visited[i] = true; 
     recStack[i] = true;
-
     const children = graph.links
       .filter((link) => link.source.id === i)
       .map((link) => link.target.id); 
@@ -147,11 +144,36 @@ export class Calculation {
   public static isCyclic(graph: Graph): boolean {
     const visited = []; 
     const recStack = []; 
-      
     for (let i = 0; i < graph.nodes.length; i++) 
-        if (this.isCyclicUtil(i, visited, recStack, graph)) 
-            return true;
-
-    return false; 
-  }
+      if (this.isCyclicUtil(i, visited, recStack, graph)) 
+        return true;
+    return false;
+	}
+	
+	public static isConnected(graph: Graph) { 
+    if (graph.links.length === 0 && graph.nodes.length === 0)
+      return true;
+    
+    const visited = []; 
+		for (let i = 0; i < graph.nodes.length; i++) 
+				visited[i] = false; 
+    this.DFSUtil(graph, graph.nodes[0].id, visited);
+    return !visited.includes(false)
+	} 
+  
+  private static DFSUtil(graph: Graph, vert: number, visited: boolean[]) { 
+    if (vert !== undefined) {
+      visited[vert] = true;
+    }
+	
+		const neighbours = graph.links
+      .filter((link) => link.source.id === vert)
+      .map((link) => link.target.id);
+	
+		for (const i in neighbours) {
+      const elem = neighbours[i];
+      if (!visited[elem]) 
+        this.DFSUtil(graph, elem, visited); 
+		} 
+	}
 }

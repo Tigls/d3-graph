@@ -1,10 +1,11 @@
 import { GraphSVG } from './graph-ui/graph-simulation';
-import { saveToFile, newGraph } from './ui/header';
+import { saveToFile, newGraph, toggleGraph } from './ui/header';
 import { Getters } from './graph-calc/Getters';
 import { GraphType } from './graph-classes/Graph';
 import { QueueList } from './graph-calc/QueueList';
 import { Queue } from './graph-calc/Queue';
 import { Calculation } from './graph-calc/Calculation';
+export type GraphString = 'graphTS' | 'graphCS';
 declare global {
   interface Window {
     state: any;
@@ -44,14 +45,20 @@ const links = [
   { source: nodes[10], target: nodes[0], id: 11, weight: 1 },
 ]
 
-window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes, '#graphTask');
 window.state.graphCS = new GraphSVG(GraphType.GraphCS, [], [], '#graphCS');
+window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes, '#graphTS');
 
 document.querySelectorAll('a.dropdown-item')
   .forEach((el) => {
     el.innerHTML === 'Запис' && el.addEventListener('click', saveToFile);
     el.innerHTML === 'Новий' && el.addEventListener('click', newGraph);
   });
+
+document.querySelectorAll('label.btn-secondary')
+  .forEach((el) => {
+    el.addEventListener('click', toggleGraph);
+  })
+
 
 // const matrix1 = Getters.getMatrix(window.state.graphTS);
 // console.log(matrix1)
@@ -60,13 +67,9 @@ document.querySelectorAll('a.dropdown-item')
 // const linkWeight = Getters.getLinkWeights(window.state.graphTS, 1)
 // console.log('link wights: ', linkWeight);
 
-const result = Queue.queue3(window.state.graphTS);
-console.log('3: ', result);
-const result15 = QueueList.queue15List(window.state.graphTS);
-console.log('15: ', result15);
-const result12 = QueueList.queue12List(window.state.graphTS);
-console.log('12: ', result12);
-
-const matrix1 = Getters.getMatrix(window.state.graphTS);
-const isCyclic = Calculation.isCyclic(window.state.graphTS);
-console.log('isCyclic: ', isCyclic);
+// const result = Queue.queue3(window.state.graphTS);
+// console.log('3: ', result);
+// const result15 = QueueList.queue15List(window.state.graphTS);
+// console.log('15: ', result15);
+// const result12 = QueueList.queue12List(window.state.graphTS);
+// console.log('12: ', result12);

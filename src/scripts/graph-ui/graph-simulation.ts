@@ -4,7 +4,10 @@ import { ILink } from '../graph-classes/Link';
 import { INode } from '../graph-classes/Node';
 import { GraphType, Graph } from '../graph-classes/Graph';
 import { Simulation } from 'd3';
+import { checkGraph } from '../ui/header';
+import { GraphString } from '..';
 declare const state: any;
+export type HtmlID = '#graphTS' | '#graphCS';
 
 export class GraphSVG extends Graph {
   width = 1080;
@@ -21,26 +24,26 @@ export class GraphSVG extends Graph {
   should_drag: boolean;
   new_line: any;
   htmlId: string;
-  constructor(type: GraphType, links:ILink[]=[], nodes:INode[]=[], htmlId) {
+  htmlType: any;
+  constructor(type: GraphType, links:ILink[]=[], nodes:INode[]=[], htmlId: HtmlID) {
     super(type, links, nodes);
     this.htmlId = htmlId;
+    this.htmlType = htmlId.slice(1);
     this.init();
   }
   
   init() {
     this.simulation = d3
       .forceSimulation(this.nodes)
-      .force("link", d3.forceLink(this.links).distance(150))
-      .force("charge", d3.forceManyBody().strength(-200))
+      .force("link", d3.forceLink(this.links).distance(200))
+      .force("charge", d3.forceManyBody().strength(-150))
       .force("center", d3.forceCenter(this.width / 2, this.height / 2));
 
     const svg = d3.select(this.htmlId);
     this.svg = svg;
     this.initialGraph();
-    console.log('Before update: ', this);
     this.update();
     this.update();
-    console.log('After update:', this);
     d3.select(this.htmlId)
       .on("mousemove", this.mousemove.bind(this))
       .on("mousedown", this.mousedown.bind(this))
@@ -75,7 +78,7 @@ export class GraphSVG extends Graph {
   update() {
     const link = this.linesg
       .selectAll("line")
-      .data(this.links);
+      .data(this.links, (d) => d.id);
     link
       .enter()
       .append("line")
@@ -90,7 +93,7 @@ export class GraphSVG extends Graph {
 
     const node = this.circlesg
       .selectAll("g")
-      .data(this.nodes);
+      .data(this.nodes, (d) => d.id);
     const nodeg = node
       .enter()
       .append("g")
@@ -159,14 +162,11 @@ export class GraphSVG extends Graph {
           .attr("x2", (d) => x)
           .attr("y2", (d) => y);
       }
-      this.update();
-      this.update();
     }
   }
 
   // add a new disconnected node
   mousedown() {
-    console.log('!!!!!!', this);
     this.simulation.stop();
     const m = d3.mouse(d3.select(this.htmlId).node())
     this.nodes.push({ 
@@ -179,7 +179,7 @@ export class GraphSVG extends Graph {
     this.selected_link = null;
     this.update();
     this.update();
-    console.log('After Mouse Down: ', this);
+    checkGraph(this.htmlType);
   }
 
   node_mouseover(d) {
@@ -247,14 +247,15 @@ export class GraphSVG extends Graph {
         weight: 1
       })
       this.selected_node = this.selected_target_node = null;
-      this.update();
-      this.update();
       this.new_line.remove();
       this.new_line = null;
       this.simulation.restart()
+      this.update();
+      this.update();
+      checkGraph(this.htmlType);
       // setTimeout(function () {
-        // this.new_line.remove();
-        // this.new_line = null;
+      //   this.new_line.remove();
+      //   this.new_line = null;
       //   this.simulation.restart();
       // }, 300);
     }
@@ -266,6 +267,7 @@ export class GraphSVG extends Graph {
         this.should_drag = false;
         this.update();
         this.update();
+        checkGraph(this.htmlType);
         // this.simulation.restart();
       }
     }
@@ -287,12 +289,13 @@ export class GraphSVG extends Graph {
             }
           });
           this.links = new_links;
-          this.selected_node = this.nodes.length ? this.nodes[i > 0 ? i - 1 : 0] : null;
-        } else if (this.selected_link) { // deal with links
-          const i = this.links.indexOf(this.selected_link);
-          this.links.splice(i, 1);
-          this.selected_link = this.links.length ? this.links[i > 0 ? i - 1 : 0] : null;
-        }
+          this.selected_node = null;
+        } 
+        // else if (this.selected_link) { // deal with links
+        //   const i = this.links.indexOf(this.selected_link);
+        //   this.links.splice(i, 1);
+        //   this.selected_link = this.links.length ? this.links[i > 0 ? i - 1 : 0] : null;
+        // }
         this.update();
         this.update();
         break;
