@@ -17,12 +17,10 @@ export class ModellingNode {
 
   setTask(newTask: QueueNode): void {
     this.task = newTask;
-    if (!newTask) {
+    if (newTask !== null) {
       newTask.processor = this;
     }
   }
-
-  getTask () {}
 
   isLinkBusy(time: number, length: number, numOfLinks: number): boolean {
     let i = 0;

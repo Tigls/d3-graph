@@ -5,6 +5,7 @@ import { GraphType } from './graph-classes/Graph';
 import { QueueList } from './graph-calc/QueueList';
 import { Queue } from './graph-calc/Queue';
 import { Calculation } from './graph-calc/Calculation';
+import { modeling } from './graph-calc/Modelling';
 export type GraphString = 'graphTS' | 'graphCS';
 declare global {
   interface Window {
@@ -45,7 +46,20 @@ const links = [
   { source: nodes[10], target: nodes[0], id: 11, weight: 1 },
 ]
 
-window.state.graphCS = new GraphSVG(GraphType.GraphCS, [], [], '#graphCS');
+const nodesCS = [
+  { id: 0, weight: 1 },
+  { id: 1, weight: 1 },
+  { id: 2, weight: 1 },
+  { id: 3, weight: 1 },
+];
+const linksCS = [
+  { source: nodesCS[0], target: nodesCS[1], id: 0, weight: 1 },
+  { source: nodesCS[2], target: nodesCS[1], id: 1, weight: 1 },
+  { source: nodesCS[3], target: nodesCS[2], id: 2, weight: 1 },
+  { source: nodesCS[3], target: nodesCS[0], id: 3, weight: 1 },
+]
+
+window.state.graphCS = new GraphSVG(GraphType.GraphCS, linksCS, nodesCS, '#graphCS');
 window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes, '#graphTS');
 
 document.querySelectorAll('a.dropdown-item')
@@ -73,3 +87,7 @@ document.querySelectorAll('label.btn-secondary')
 // console.log('15: ', result15);
 // const result12 = QueueList.queue12List(window.state.graphTS);
 // console.log('12: ', result12);
+
+console.log(window.state.graphCS);
+
+console.log(modeling(window.state.graphTS, window.state.graphCS));

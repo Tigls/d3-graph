@@ -40,16 +40,17 @@ export class Processors {
 		return null;
   }
   
-  public static getProcessor1(list: ModellingNode[]): ModellingNode{
+  public static getProcessor1(list: ModellingNode[]): ModellingNode {
 		let result: ModellingNode = null;
 		const freeNodes: ModellingNode[] = [];
 		for (let node of list) {
-			if (node.getTask() == null) {
+			if (node.task == null) {
 				freeNodes.push(node);
 			}
 		}
 		if (freeNodes.length > 0) {
-			const index = 1 + Math.random() * ((freeNodes.length - 1) + 1);
+      const index = Math.floor((1 + Math.random() * ((freeNodes.length - 1) + 1)) / 1);
+      console.log(index); 
 			result = freeNodes[index - 1];
 		}
 		return result;

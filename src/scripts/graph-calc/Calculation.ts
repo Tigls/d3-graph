@@ -53,7 +53,7 @@ export class Calculation {
   public static dijkstra(graph: Matrix, src: number, dst: number): Array<number> {
 		let size = graph.length;
 		const dist = [];
-		let list: Matrix;
+		let list: Matrix = [];
 		for (let i = 0; i < size; i++) {
 			list.push([]);
 		}
