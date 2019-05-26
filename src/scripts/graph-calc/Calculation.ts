@@ -1,6 +1,5 @@
-import { Graph, Matrix, GraphType } from "../graph-classes/Graph";
+import { Graph, Matrix } from "../graph-classes/Graph";
 import { Getters } from "./Getters";
-import { INode } from "../graph-classes/Node";
 
 export class Calculation {
 

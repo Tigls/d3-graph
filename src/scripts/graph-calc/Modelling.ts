@@ -1,6 +1,6 @@
 import { ModellingNode } from '../graph-classes/ModellingNode';
 import { QueueList } from './QueueList';
-import { Matrix, GraphType, Graph } from '../graph-classes/Graph';
+import { Matrix, Graph } from '../graph-classes/Graph';
 import { Calculation } from './Calculation';
 import { Getters } from './Getters';
 import { QueueNode } from '../graph-classes/QueueNode';
@@ -8,18 +8,16 @@ import { Processors } from './Processors';
 import { ModellingLink } from '../graph-classes/ModellingLink';
 
 
-export function modeling(currentGraphTask: Graph, currentGraphCS: Graph): ModellingNode[] {
+export function modeling(currentGraphTask: Graph, currentGraphCS: Graph, queueAlg:number, setAlg: number): ModellingNode[] {
   let prodLines = 1;
-  let queueAlg = 6;
   let numOfLines = currentGraphTask.links.length;
-  let setAlg = 1;
   const prod = 1;
   
   let queue = QueueList.queue1List(currentGraphTask);
-  if (queueAlg === 6) {
-    queue = QueueList.queue6List(currentGraphTask);
-  } else if (queueAlg == 12) {
-    queue = QueueList.queue12List(currentGraphTask);
+  if (queueAlg === 3) {
+    queue = QueueList.queue3List(currentGraphTask);
+  } else if (queueAlg == 15) {
+    queue = QueueList.queue15List(currentGraphTask);
   }
   const processors:ModellingNode[] = [];
   const matrix: Matrix = Getters.getMatrix(currentGraphCS);
@@ -50,7 +48,7 @@ export function modeling(currentGraphTask: Graph, currentGraphCS: Graph): Modell
     while (Processors.hasReadyTasks(queue) && Processors.hasFreeProccessors(processors)) {
       const readyTask: QueueNode = Processors.getReadyTask(queue);
       let processor: ModellingNode = Processors.getProcessor1(processors);
-      if (setAlg == 5) {
+      if (setAlg == 4) {
         processor = Processors.getProcessor5(processors, readyTask, matrix, linesWeight);
       }
 

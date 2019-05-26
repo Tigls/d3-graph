@@ -8,7 +8,7 @@ export class Queue {
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
 			const n: QueueNode = list[i];
-			result = result + (n.id + 1) + "(" + n.factor1.toString() + "), ";
+			result = result + n.id + "-" + n.factor1.toString() + " --> ";
 		}
 		return result;
   }
@@ -17,8 +17,12 @@ export class Queue {
 		const list = QueueList.queue1List(graph);
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
-			const n: QueueNode = list[i];
-			result = result + (n.id + 1) + "(" + n.criticalTime.toString() + "), ";
+      const n: QueueNode = list[i];
+      if (!result) {
+        result = result + "id-крит.час: " + n.id + "-" + n.criticalTime.toString();
+      } else {
+        result = result + " --> " + n.id + "-" + n.criticalTime.toString();
+      }
 		}
 		return result;
 	}
@@ -28,7 +32,7 @@ export class Queue {
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
 			const n: QueueNode = list[i];
-			result = result + (n.id + 1) + "(" + n .criticalDepth + "), ";
+			result = result + n.id + "-" + n .criticalDepth + " --> ";
 		}
 		return result;
 	}
@@ -38,7 +42,7 @@ export class Queue {
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
       const n: QueueNode = list[i];
-			result = result + (n.id + 1) + "(" + n.numOfOut + "), ";
+			result = result + n.id + "-" + n.numOfOut + " --> ";
 		}
 		return result;
   }
@@ -48,7 +52,11 @@ export class Queue {
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
       const n: QueueNode = list[i];
-			result = result + (n.id + 1) + "(" + n.weight + "), ";
+      if (!result) {
+        result = result + "id-вага_вершин: " + n.id + "-" + n.weight;
+      } else {
+        result = result + " --> " + n.id + "-" + n.weight;
+      }
 		}
 		return result;
 	}

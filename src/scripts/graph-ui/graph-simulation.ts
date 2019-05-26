@@ -5,7 +5,6 @@ import { INode } from '../graph-classes/Node';
 import { GraphType, Graph } from '../graph-classes/Graph';
 import { Simulation } from 'd3';
 import { checkGraph } from '../ui/header';
-import { GraphString } from '..';
 declare const state: any;
 export type HtmlID = '#graphTS' | '#graphCS';
 
@@ -73,6 +72,7 @@ export class GraphSVG extends Graph {
     
     this.circlesg = this.svg.append("g")
       .attr("class", "nodes")
+    this.svg.selectAll("line").attr("marker-end", "url(#triangle)");
   }
 
   update() {
@@ -89,16 +89,16 @@ export class GraphSVG extends Graph {
       .exit()
       .remove();
 
-    d3.selectAll("line").attr("marker-end", "url(#triangle)");
+    this.svg.selectAll("line").attr("marker-end", "url(#triangle)");
 
     const node = this.circlesg
       .selectAll("g")
-      .data(this.nodes, (d) => d.id);
+      .data(this.nodes, d => d.id);
     const nodeg = node
       .enter()
       .append("g")
       .call(drag(this.simulation))
-      .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+      .attr("transform", d => `translate(${d.x}, ${d.y})`);
     const circles = nodeg
       .append("circle")
       .attr("r", 25)

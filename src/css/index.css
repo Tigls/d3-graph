@@ -1,6 +1,13 @@
 .graph {
     background-color: #1d1f20;
   }
+  .parent {
+    display: flex;
+  }
+
+.back-dark {
+  background-color: #1d1f20;
+}
 
 .unselectable {
   -webkit-touch-callout: none;
@@ -17,4 +24,31 @@
 
 .hidden {
   display: none;
+}
+
+.axisLight line{
+  stroke: #666666;
+}
+
+.axisLight path{
+  stroke: #666666;
+}
+
+.axisLight text{
+  fill: #666666;
+} 
+
+.bar {
+  fill: #666666;
+  stroke: #1d1f20;
+  stroke-width: 1px;
+}
+
+.text-style-common {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-family: cursive;
+  color: #666666;
+  font-size: 0.8em;
+  padding-right: 100px;
 }

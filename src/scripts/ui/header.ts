@@ -1,9 +1,10 @@
 import { saveAs } from 'file-saver';
 import { GraphSVG } from '../graph-ui/graph-simulation';
-import { GraphType } from '../graph-classes/Graph';
+import { GraphType, Graph } from '../graph-classes/Graph';
 import * as d3 from '../utils/d3';
 import { GraphString } from '../index';
 import { Calculation } from '../graph-calc/Calculation';
+import { Queue } from '../graph-calc/Queue';
 declare const state: any;
 
 export function saveToFile() {
@@ -51,4 +52,14 @@ export function checkGraph(graphType: GraphString) {
     const isConnected = Calculation.isConnected(window.state.graphCS);
     isConnected ? showHideElem('#adjacentGraph') : showHideElem('#nonAdjacentGraph');
   }
+}
+
+export function stringQueue(graph: Graph, algo: number) {
+  let result;
+  if (algo === 3) {
+    result = Queue.queue3(graph);
+  } else if (algo === 15) {
+    result = Queue.queue15(graph);
+  }
+  return result;
 }

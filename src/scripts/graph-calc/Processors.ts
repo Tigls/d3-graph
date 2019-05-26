@@ -50,7 +50,6 @@ export class Processors {
 		}
 		if (freeNodes.length > 0) {
       const index = Math.floor((1 + Math.random() * ((freeNodes.length - 1) + 1)) / 1);
-      console.log(index); 
 			result = freeNodes[index - 1];
 		}
 		return result;

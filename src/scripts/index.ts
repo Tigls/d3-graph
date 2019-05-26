@@ -1,11 +1,8 @@
 import { GraphSVG } from './graph-ui/graph-simulation';
-import { saveToFile, newGraph, toggleGraph } from './ui/header';
-import { Getters } from './graph-calc/Getters';
+import { saveToFile, newGraph, toggleGraph, stringQueue } from './ui/header';
 import { GraphType } from './graph-classes/Graph';
-import { QueueList } from './graph-calc/QueueList';
-import { Queue } from './graph-calc/Queue';
-import { Calculation } from './graph-calc/Calculation';
 import { modeling } from './graph-calc/Modelling';
+import { GanttChart } from './graph-ui/gantt-chart';
 export type GraphString = 'graphTS' | 'graphCS';
 declare global {
   interface Window {
@@ -62,6 +59,10 @@ const linksCS = [
 window.state.graphCS = new GraphSVG(GraphType.GraphCS, linksCS, nodesCS, '#graphCS');
 window.state.graphTS = new GraphSVG(GraphType.GraphTask, links, nodes, '#graphTS');
 
+const model = modeling(window.state.graphTS, window.state.graphCS, 3, 1)
+console.log(model);
+window.state.model1 = new GanttChart(model, '#gantt');
+
 document.querySelectorAll('a.dropdown-item')
   .forEach((el) => {
     el.innerHTML === 'Запис' && el.addEventListener('click', saveToFile);
@@ -73,21 +74,21 @@ document.querySelectorAll('label.btn-secondary')
     el.addEventListener('click', toggleGraph);
   })
 
+document.querySelector('#queue').innerHTML = stringQueue(window.state.graphTS, 3);
+document.querySelectorAll('input[name=queuAlgo]')
+  .forEach((el) => {
+    el.addEventListener('change', () => {
+      const checkedRadio = document.querySelector('input[name=queuAlgo]:checked').value;
+      document.querySelector('#queue').innerHTML = stringQueue(window.state.graphTS, Number(checkedRadio)); 
+    });
+  });
 
-// const matrix1 = Getters.getMatrix(window.state.graphTS);
-// console.log(matrix1)
-// const nodeWeight = Getters.getWeights(window.state.graphTS)
-// console.log('Node wights: ', nodeWeight);
-// const linkWeight = Getters.getLinkWeights(window.state.graphTS, 1)
-// console.log('link wights: ', linkWeight);
-
-// const result = Queue.queue3(window.state.graphTS);
-// console.log('3: ', result);
-// const result15 = QueueList.queue15List(window.state.graphTS);
-// console.log('15: ', result15);
-// const result12 = QueueList.queue12List(window.state.graphTS);
-// console.log('12: ', result12);
-
-console.log(window.state.graphCS);
-
-console.log(modeling(window.state.graphTS, window.state.graphCS));
+document.querySelectorAll('input[name=assignAlgo]')
+  .forEach((el) => {
+    el.addEventListener('change', () => {
+      const checkedRadioQueue = document.querySelector('input[name=queuAlgo]:checked').value;
+      const checkedRadioAssign = document.querySelector('input[name=assignAlgo]:checked').value;
+      const model = modeling(window.state.graphTS, window.state.graphCS, Number(checkedRadioQueue), Number(checkedRadioAssign))
+      window.state.model1.init(model);
+    });
+  });
