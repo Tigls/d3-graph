@@ -59,7 +59,7 @@ export function modeling(currentGraphTask: Graph, currentGraphCS: Graph, queueAl
           let route: number[] = Calculation.dijkstra(matrix, processors.indexOf(doneTask.processor), processors.indexOf(processor));
           const w = linesWeight[doneTask.id][readyTask.id];
 
-          let time = (setAlg == 5 ? doneTask.endTime : tick);
+          let time = (setAlg == 4 ? doneTask.endTime : tick);
 
           if (route.length == 1) {
             maxStartTime = Math.max(maxStartTime, time);
@@ -109,6 +109,7 @@ export function modeling(currentGraphTask: Graph, currentGraphCS: Graph, queueAl
       }
     }
   }
-  processors.push(new ModellingNode(tick));
+  // processors.push(new ModellingNode(tick));
+
   return processors;
 }

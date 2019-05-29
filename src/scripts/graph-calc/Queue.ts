@@ -14,7 +14,7 @@ export class Queue {
   }
   
   public static queue3(graph: Graph): string {
-		const list = QueueList.queue1List(graph);
+		const list = QueueList.queue3List(graph);
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
       const n: QueueNode = list[i];
@@ -38,7 +38,7 @@ export class Queue {
 	}
 
 	public static queue12(graph: Graph): string{
-		const list: QueueNode[] = QueueList.queue6List(graph);
+		const list: QueueNode[] = QueueList.queue12List(graph);
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
       const n: QueueNode = list[i];
@@ -48,7 +48,7 @@ export class Queue {
   }
   
   public static queue15(graph: Graph): string{
-		const list: QueueNode[] = QueueList.queue6List(graph);
+		const list: QueueNode[] = QueueList.queue15List(graph);
 		let result = "";
 		for (let i = 0; i < list.length; i++) {
       const n: QueueNode = list[i];

@@ -27,7 +27,7 @@ export class ModellingNode {
     for (let link of this.links) {
       if(Math.max(link.startTime, time) < Math.min(link.endTime, time + length)) {
         i++;
-        if (i === numOfLinks) {
+        if (i > 0) {
           return true;
         }
       }

@@ -95,37 +95,46 @@ export class QueueList {
   }
   
   public static sortedNodesList(list: QueueNode[], algN: number): QueueNode[] {
-    for (let i = 0; i < list.length - 1; i++) {
-      for (let j = 0; j < list.length - i - 1; j++) {
-        let flag = false;
-        switch (algN) {
-          case 1:
-            flag = (list[j].factor1 <= list[j + 1].factor1);
-            break;
-          case 3:
-            flag = (list[j].criticalTime <= list[j + 1].criticalTime);
-            break;
-          case 6:
-            flag = (list[j].criticalDepth <= list[j + 1].criticalDepth);
-            break;
-          case 12:
-            flag = (list[j].numOfOut <= list[j + 1].numOfOut);
-            break;
-          case 15:
-            flag = (list[j].criticalDepth <= list[j + 1].criticalDepth);
-            if (list[j].criticalDepth === list[j + 1].criticalDepth) {
-              flag = list[j].weight <= list[j + 1].weight;
-            }
-            break;
-        }
-				if (flag) {
-					const temp = list[j];
-					list[j] = list[j + 1];
-					list[j + 1] = temp;
-				}
-      }
+    switch (algN) {
+      case 1:
+        return list.sort((a, b) => a.factor1 - b.factor1);
+      case 3:
+        return list.sort((a, b) => a.criticalTime - b.criticalTime);
+      case 6:
+        return list.sort((a, b) => a.criticalDepth - b.criticalDepth);
+      case 12:
+        return list.sort((a, b) => a.numOfOut - b.numOfOut);
+      case 15:
+        return list.sort((a, b) => a.weight - b.weight);
     }
-    return list;
+    // for (let i = 0; i < list.length - 1; i++) {
+    //   for (let j = 0; j < list.length - i - 1; j++) {
+    //     let flag = false;
+        // switch (algN) {
+        //   case 1:
+        //     flag = (list[j].factor1 <= list[j + 1].factor1);
+        //     break;
+        //   case 3:
+        //     flag = (list[j].criticalTime <= list[j + 1].criticalTime);
+        //     break;
+        //   case 6:
+        //     flag = (list[j].criticalDepth <= list[j + 1].criticalDepth);
+        //     break;
+        //   case 12:
+        //     flag = (list[j].numOfOut <= list[j + 1].numOfOut);
+        //     break;
+        //   case 15:
+        //     flag = list[j].weight <= list[j + 1].weight;
+        //     break;
+        // }
+		// 		if (flag) {
+		// 			const temp = list[j];
+		// 			list[j] = list[j + 1];
+		// 			list[j + 1] = temp;
+		// 		}
+    //   }
+    // }
+    // return list;
   }
 
   public static getQueueNodeList(arr: QueueNode[], matrix: Matrix): QueueNode[] {

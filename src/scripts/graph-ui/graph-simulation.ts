@@ -111,7 +111,7 @@ export class GraphSVG extends Graph {
       .on("mouseout", this.node_mouseout.bind(this));
     const lables = nodeg
       .append("text")
-      .text(d => `node ${d.id}`)
+      .text(d => `id ${d.id} \n(${d.weight})`)
       .classed("unselectable", true)
       .style("fill", "#666666")
       .style("font-weight", "600")

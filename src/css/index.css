@@ -44,6 +44,18 @@
   stroke-width: 1px;
 }
 
+.linkr {
+  fill: #03bb1c;
+  stroke: #1d1f20;
+  stroke-width: 1px;
+}
+
+.links {
+  fill: #2629eb;
+  stroke: #1d1f20;
+  stroke-width: 1px;
+}
+
 .text-style-common {
   font-weight: 600;
   text-transform: uppercase;

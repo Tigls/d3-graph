@@ -15,32 +15,61 @@ window.state = {
   height: 800,
 }
 
+// const nodes = [
+//   { id: 0, weight: 41 },
+//   { id: 1, weight: 51 },
+//   { id: 2, weight: 50 },
+//   { id: 3, weight: 36 },
+//   { id: 4, weight: 38 },
+//   { id: 5, weight: 45 },
+//   { id: 6, weight: 21 },
+//   { id: 7, weight: 32 },
+//   { id: 8, weight: 32 },
+//   { id: 9, weight: 29 },
+//   { id: 10, weight: 29 },
+// ];
+// const links = [
+//   { source: nodes[0], target: nodes[1], id: 0, weight: 1 },
+//   { source: nodes[0], target: nodes[7], id: 1, weight: 1 },
+//   { source: nodes[0], target: nodes[9], id: 2, weight: 1 },
+//   { source: nodes[1], target: nodes[2], id: 3, weight: 1 },
+//   { source: nodes[6], target: nodes[3], id: 4, weight: 1 },
+//   { source: nodes[6], target: nodes[8], id: 5, weight: 1 },
+//   { source: nodes[7], target: nodes[3], id: 6, weight: 1 },
+//   { source: nodes[7], target: nodes[8], id: 7, weight: 1 },
+//   { source: nodes[8], target: nodes[2], id: 8, weight: 1 },
+//   { source: nodes[9], target: nodes[4], id: 9, weight: 1 },
+//   { source: nodes[9], target: nodes[6], id: 10, weight: 1 },
+//   { source: nodes[10], target: nodes[0], id: 11, weight: 1 },
+// ]
+
+// const nodesCS = [
+//   { id: 0, weight: 1 },
+//   { id: 1, weight: 1 },
+//   { id: 2, weight: 1 },
+//   { id: 3, weight: 1 },
+// ];
+// const linksCS = [
+//   { source: nodesCS[0], target: nodesCS[1], id: 0, weight: 1 },
+//   { source: nodesCS[2], target: nodesCS[1], id: 1, weight: 1 },
+//   { source: nodesCS[3], target: nodesCS[2], id: 2, weight: 1 },
+//   { source: nodesCS[3], target: nodesCS[0], id: 3, weight: 1 },
+// ]
+
 const nodes = [
-  { id: 0, weight: 41 },
-  { id: 1, weight: 51 },
-  { id: 2, weight: 50 },
-  { id: 3, weight: 36 },
-  { id: 4, weight: 38 },
-  { id: 5, weight: 45 },
-  { id: 6, weight: 21 },
-  { id: 7, weight: 32 },
-  { id: 8, weight: 32 },
-  { id: 9, weight: 29 },
-  { id: 10, weight: 29 },
+  { id: 0, weight: 1 },
+  { id: 1, weight: 2 },
+  { id: 2, weight: 3 },
+  { id: 3, weight: 4 },
+  { id: 4, weight: 5 },
+  { id: 5, weight: 5 },
 ];
 const links = [
-  { source: nodes[0], target: nodes[1], id: 0, weight: 1 },
-  { source: nodes[0], target: nodes[7], id: 1, weight: 1 },
-  { source: nodes[0], target: nodes[9], id: 2, weight: 1 },
-  { source: nodes[1], target: nodes[2], id: 3, weight: 1 },
-  { source: nodes[6], target: nodes[3], id: 4, weight: 1 },
-  { source: nodes[6], target: nodes[8], id: 5, weight: 1 },
-  { source: nodes[7], target: nodes[3], id: 6, weight: 1 },
-  { source: nodes[7], target: nodes[8], id: 7, weight: 1 },
-  { source: nodes[8], target: nodes[2], id: 8, weight: 1 },
-  { source: nodes[9], target: nodes[4], id: 9, weight: 1 },
-  { source: nodes[9], target: nodes[6], id: 10, weight: 1 },
-  { source: nodes[10], target: nodes[0], id: 11, weight: 1 },
+  { source: nodes[0], target: nodes[4], id: 0, weight: 1 },
+  { source: nodes[1], target: nodes[4], id: 1, weight: 1 },
+  { source: nodes[2], target: nodes[4], id: 2, weight: 1 },
+  { source: nodes[3], target: nodes[4], id: 3, weight: 1 },
+  { source: nodes[5], target: nodes[4], id: 4, weight: 1 },
 ]
 
 const nodesCS = [
@@ -48,12 +77,13 @@ const nodesCS = [
   { id: 1, weight: 1 },
   { id: 2, weight: 1 },
   { id: 3, weight: 1 },
+  { id: 4, weight: 1 },
 ];
 const linksCS = [
-  { source: nodesCS[0], target: nodesCS[1], id: 0, weight: 1 },
-  { source: nodesCS[2], target: nodesCS[1], id: 1, weight: 1 },
-  { source: nodesCS[3], target: nodesCS[2], id: 2, weight: 1 },
-  { source: nodesCS[3], target: nodesCS[0], id: 3, weight: 1 },
+  { source: nodesCS[0], target: nodesCS[1], id: 0, weight: 4 },
+  { source: nodesCS[1], target: nodesCS[2], id: 1, weight: 2 },
+  { source: nodesCS[2], target: nodesCS[3], id: 2, weight: 6 },
+  { source: nodesCS[3], target: nodesCS[4], id: 3, weight: 5 },
 ]
 
 window.state.graphCS = new GraphSVG(GraphType.GraphCS, linksCS, nodesCS, '#graphCS');
